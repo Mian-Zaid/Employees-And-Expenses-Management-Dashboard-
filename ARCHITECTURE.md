@@ -74,9 +74,29 @@ print-only stylesheet.
   English, Roman-Urdu, Urdu script and Hindi script, plus Arabic-Indic and
   Devanagari digit normalisation (e.g. *“panch so” / «پانچ سو» / ۵۰۰ → 500*).
 
-Two UX modes: per-field mics for single values, and a sentence-level
-**Voice Quick Entry** parser that extracts worker + attendance + advance from a
-spoken phrase.
+Three UX modes:
+1. **Per-field mics** for single values.
+2. **Voice Quick Entry** on the Daily tab — pre-fills the daily form from a phrase.
+3. **Global Smart Mic** (`js/nlu.js`) — a floating button on every tab that
+   parses a free sentence, **infers the intent** (add worker vs. daily entry),
+   and executes it directly.
+
+### NLU layer (`js/nlu.js`)
+
+`NLU.parse(text, workers)` returns a structured command:
+
+```
+addWorker  → { name, role, wage }
+dailyEntry → { workerId, attendance, advance, dateOffset }
+unknown    → { reason }
+```
+
+Intent is decided from a few signals: an explicit add trigger (“naya/add”),
+whether the sentence names an **existing** worker (→ daily entry), and whether a
+role word is present (→ add worker). Entities are pulled with small keyword sets
+plus number-run extraction that ties a number to its nearest wage/advance
+keyword, so “dihari 1200” (wage) is never confused with an advance. Every action
+is reversible via an **Undo** snackbar, keeping a best-effort parser safe.
 
 ### Gotchas (same spirit as the reference doc's "Common Pitfalls")
 

@@ -38,7 +38,28 @@ after adjusting the advances they already took.
 
 ## 🎤 Voice entry
 
-Two ways to use speech:
+### 🎙️ Global Smart Mic — "bol kar kuch bhi likhein"
+
+The floating mic button (bottom-right, on every tab) is the fastest way to work.
+Just **speak a full sentence** and the app **figures out what you mean** and does
+the entry automatically — add a worker, or record a day's attendance + advance:
+
+| You say | What happens |
+| --- | --- |
+| “naya mazdoor **Bilal** dihari **1500**” | Adds worker Bilal (Mazdoor, Rs 1500/day) |
+| “**Aslam** mistri dihari **bara so**” | Adds Aslam (Mistri, Rs 1200/day) |
+| “**Aslam** full day advance **500**” | Marks Aslam full day + Rs 500 advance |
+| “**Ali** aadha din **300** kharcha” | Marks Ali half day + Rs 300 advance |
+| “**Aslam** ko **kal** 500 diye” | Records yesterday's advance of Rs 500 |
+| “**Ali** absent” | Marks Ali absent |
+
+Works in Urdu, Hindi and Roman-Urdu. After each command an **Undo** bar appears
+for a few seconds, so a wrong guess is never a problem. If it can't understand,
+it says so and shows an example — nothing is saved.
+
+### Other voice options
+
+Two more focused ways to use speech:
 
 1. **Field mic (🎤)** next to a box — tap and speak just that value
    (name, wage, advance, note). Spoken numbers like *“panch so”* / *«پانچ سو»*
