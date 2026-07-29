@@ -39,6 +39,22 @@
   langSel.addEventListener("change", () => Store.setSetting("speechLang", langSel.value));
   const currentLang = () => langSel.value;
 
+  // Human-friendly reason when speech recognition fails.
+  function micError(e) {
+    const code = (e && e.message) || "";
+    const map = {
+      "not-allowed": "Mic ki ijazat nahi mili — browser me 🎤 allow karein.",
+      "service-not-allowed": "Mic blocked hai — browser settings me allow karein.",
+      "audio-capture": "Mic nahi mila — device ka microphone check karein.",
+      "no-speech": "Awaaz nahi aayi — thoda paas ho kar dobara boliye.",
+      "network": "Voice ke liye internet chahiye — connection check karein.",
+      "language-not-supported": "Ye zubaan support nahi — header se English/Urdu badlein.",
+      "aborted": "",
+    };
+    if (code in map) return map[code];
+    return "Sun nahi paya — dobara try karein.";
+  }
+
   // ---------- mic buttons (fill a single field) ----------
   function wireMic(btn) {
     btn.addEventListener("click", async () => {
@@ -63,7 +79,8 @@
           target.dispatchEvent(new Event("input"));
         }
       } catch (e) {
-        toast("Could not hear that — try again.", true);
+        const m = micError(e);
+        if (m) toast(m, true);
       } finally {
         btn.classList.remove("recording");
         statusEl.hidden = true;
@@ -236,7 +253,8 @@
       applyVoiceQuick(text);
     } catch (e) {
       statusEl.hidden = true;
-      toast("Could not hear that — try again.", true);
+      const m = micError(e);
+      if (m) toast(m, true);
     }
   });
 
@@ -392,7 +410,8 @@
     try {
       text = await Speech.listen(currentLang());
     } catch (e) {
-      toast("Could not hear that — try again.", true);
+      const m = micError(e);
+      if (m) toast(m, true);
     } finally {
       globalMic.classList.remove("recording");
       statusEl.hidden = true;
