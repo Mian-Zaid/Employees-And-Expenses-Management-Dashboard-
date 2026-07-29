@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thekedar Dashboard — Labor & Wages</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">👷</span>
+      <div>
+        <h1>Thekedar Dashboard</h1>
+        <p class="subtitle">مزدور، دیہاڑی اور ہفتہ وار حساب</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <label class="lang-select">
+        🎙️
+        <select id="speechLang" title="Voice input language">
+          <option value="ur-PK">اردو</option>
+          <option value="en-US">English</option>
+          <option value="hi-IN">हिन्दी</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="workers">Workers <span>مزدور</span></button>
+    <button class="tab" data-tab="daily">Daily Entry <span>روزانہ</span></button>
+    <button class="tab" data-tab="weekly">Weekly Salary <span>ہفتہ وار</span></button>
+  </nav>
+
+  <main>
+    <!-- ============ WORKERS ============ -->
+    <section id="tab-workers" class="tab-panel active">
+      <div class="card">
+        <h2>Add Worker <small>نیا مزدور</small></h2>
+        <form id="workerForm" class="form-grid">
+          <div class="field">
+            <label>Name / نام</label>
+            <div class="input-mic">
+              <input type="text" id="wName" placeholder="e.g. Aslam" required />
+              <button type="button" class="mic" data-target="wName" title="Speak name">🎤</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Role / کام</label>
+            <select id="wRole">
+              <option value="Mistri">Mistri / مستری</option>
+              <option value="Mazdoor">Mazdoor / مزدور</option>
+              <option value="Helper">Helper / ہیلپر</option>
+              <option value="Other">Other / دیگر</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Daily Wage (Rs) / دیہاڑی</label>
+            <div class="input-mic">
+              <input type="number" id="wWage" placeholder="e.g. 1200" min="0" step="50" required />
+              <button type="button" class="mic" data-target="wWage" data-number="1" title="Speak wage">🎤</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Phone / فون (optional)</label>
+            <input type="tel" id="wPhone" placeholder="03xx-xxxxxxx" />
+          </div>
+          <div class="field field-actions">
+            <button type="submit" class="btn btn-primary" id="workerSubmitBtn">Add Worker</button>
+            <button type="button" class="btn btn-ghost" id="workerCancelBtn" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Workers List <small id="workerCount"></small></h2>
+        <div class="table-wrap">
+          <table id="workersTable">
+            <thead>
+              <tr><th>Name</th><th>Role</th><th>Wage</th><th>Phone</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="empty" id="workersEmpty" hidden>No workers yet. Add your first worker above. 👆</p>
+      </div>
+    </section>
+
+    <!-- ============ DAILY ENTRY ============ -->
+    <section id="tab-daily" class="tab-panel">
+      <div class="card">
+        <h2>Daily Entry <small>آج کا حساب</small></h2>
+        <form id="dailyForm" class="form-grid">
+          <div class="field">
+            <label>Date / تاریخ</label>
+            <input type="date" id="dDate" required />
+          </div>
+          <div class="field">
+            <label>Worker / مزدور</label>
+            <select id="dWorker" required></select>
+          </div>
+          <div class="field">
+            <label>Attendance / حاضری</label>
+            <select id="dAttendance">
+              <option value="1">Full Day (1)</option>
+              <option value="0.5">Half Day (½)</option>
+              <option value="1.5">Overtime (1½)</option>
+              <option value="2">Double (2)</option>
+              <option value="0">Absent (0)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Advance / Kharcha given (Rs) / پیشگی</label>
+            <div class="input-mic">
+              <input type="number" id="dAdvance" placeholder="0" min="0" step="50" value="0" />
+              <button type="button" class="mic" data-target="dAdvance" data-number="1" title="Speak amount">🎤</button>
+            </div>
+          </div>
+          <div class="field field-wide">
+            <label>Note / تفصیل (optional)</label>
+            <div class="input-mic">
+              <input type="text" id="dNote" placeholder="e.g. chai-pani, material" />
+              <button type="button" class="mic" data-target="dNote" title="Speak note">🎤</button>
+            </div>
+          </div>
+          <div class="field field-actions">
+            <button type="submit" class="btn btn-primary">Save Entry</button>
+          </div>
+        </form>
+        <div class="voice-quick">
+          <button type="button" class="btn btn-voice" id="voiceQuick">🎙️ Voice Quick Entry <span>بول کر لکھیں</span></button>
+          <p class="hint" id="voiceQuickHint">Say: “Aslam full day advance 500” / «اسلم پورا دن پیشگی پانچ سو»</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Recent Entries <small>حالیہ اندراج</small></h2>
+        <div class="table-wrap">
+          <table id="entriesTable">
+            <thead>
+              <tr><th>Date</th><th>Worker</th><th>Att.</th><th>Wage</th><th>Advance</th><th>Note</th><th></th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="empty" id="entriesEmpty" hidden>No entries yet.</p>
+      </div>
+    </section>
+
+    <!-- ============ WEEKLY SALARY ============ -->
+    <section id="tab-weekly" class="tab-panel">
+      <div class="card">
+        <h2>Weekly Settlement <small>ہفتہ وار تنخواہ</small></h2>
+        <div class="week-controls">
+          <button class="btn btn-ghost" id="weekPrev">◀ Prev</button>
+          <div class="week-range" id="weekRange"></div>
+          <button class="btn btn-ghost" id="weekNext">Next ▶</button>
+          <button class="btn btn-ghost" id="weekToday">This Week</button>
+        </div>
+        <div class="table-wrap">
+          <table id="weeklyTable">
+            <thead>
+              <tr>
+                <th>Worker</th><th>Days</th><th>Wage/Day</th>
+                <th>Earned</th><th>Advances</th><th>Net Payable</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot>
+              <tr class="totals">
+                <td>Total / میزان</td><td id="tDays"></td><td></td>
+                <td id="tEarned"></td><td id="tAdvance"></td><td id="tNet"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="empty" id="weeklyEmpty" hidden>No entries for this week.</p>
+        <div class="week-actions">
+          <button class="btn btn-primary" id="weekPrint">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <div id="micStatus" class="mic-status" hidden>🎤 Listening… <span>سن رہا ہوں</span></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
