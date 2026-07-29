@@ -350,6 +350,96 @@
   $("#weekToday").addEventListener("click", () => { weekOffset = 0; renderWeekly(); });
   $("#weekPrint").addEventListener("click", () => window.print());
 
+  // ---------- GLOBAL SMART MIC ----------
+  // Speak anything; NLU infers the intent and performs the entry automatically.
+  const globalMic = $("#globalMic");
+  let lastAction = null; // { type: "worker"|"entry", id, label }
+
+  function switchTab(name) {
+    const tab = $$(".tab").find((t) => t.dataset.tab === name);
+    if (tab) tab.click();
+  }
+
+  function showSnackbar(text) {
+    const bar = $("#snackbar");
+    $("#snackText").textContent = text;
+    bar.hidden = false;
+    clearTimeout(showSnackbar._t);
+    showSnackbar._t = setTimeout(() => (bar.hidden = true), 6000);
+  }
+
+  $("#snackUndo").addEventListener("click", () => {
+    if (!lastAction) return;
+    if (lastAction.type === "worker") {
+      Store.deleteWorker(lastAction.id);
+      renderWorkers(); renderWorkerSelect();
+    } else if (lastAction.type === "entry") {
+      Store.deleteEntry(lastAction.id);
+      renderEntries();
+    }
+    renderWeekly();
+    lastAction = null;
+    $("#snackbar").hidden = true;
+    toast("Undone ↩");
+  });
+
+  globalMic.addEventListener("click", async () => {
+    if (!Speech.isSupported()) { toast("Voice not supported. Use Chrome.", true); return; }
+    const statusEl = $("#micStatus");
+    globalMic.classList.add("recording");
+    statusEl.hidden = false;
+    let text = "";
+    try {
+      text = await Speech.listen(currentLang());
+    } catch (e) {
+      toast("Could not hear that — try again.", true);
+    } finally {
+      globalMic.classList.remove("recording");
+      statusEl.hidden = true;
+    }
+    if (!text) return;
+    handleGlobalCommand(text);
+  });
+
+  function handleGlobalCommand(text) {
+    const cmd = NLU.parse(text, Store.getWorkers());
+    $("#snackUndo").hidden = false;
+
+    if (cmd.intent === "addWorker") {
+      const w = Store.addWorker({ name: cmd.name, role: cmd.role, wage: cmd.wage, phone: "" });
+      lastAction = { type: "worker", id: w.id };
+      renderWorkers(); renderWorkerSelect(); switchTab("workers");
+      showSnackbar(`➕ Worker added: ${w.name} — ${w.role}, ${rs(w.wage)}/day`);
+      toast("Worker added ✓");
+      return;
+    }
+
+    if (cmd.intent === "dailyEntry") {
+      const date = new Date();
+      date.setDate(date.getDate() + (cmd.dateOffset || 0));
+      const iso = date.toISOString().slice(0, 10);
+      const e = Store.addEntry({
+        workerId: cmd.workerId,
+        date: iso,
+        attendance: cmd.attendance,
+        advance: cmd.advance,
+        note: text,
+      });
+      lastAction = { type: "entry", id: e.id };
+      renderEntries(); switchTab("daily");
+      const attLbl = ATT_LABEL[String(cmd.attendance)] ?? cmd.attendance;
+      showSnackbar(`✓ ${cmd.name}: ${attLbl}${cmd.advance ? " + advance " + rs(cmd.advance) : ""} (${iso})`);
+      toast("Entry saved ✓");
+      return;
+    }
+
+    // unknown — could not confidently parse
+    lastAction = null;
+    toast("Samajh nahi aaya — dobara boliye 🙏", true);
+    showSnackbar(`❓ Heard: “${text}”. Try: “Aslam mistri dihari 1200” or “Aslam full day advance 500”.`);
+    $("#snackUndo").hidden = true;
+  }
+
   // ---------- misc ----------
   function escapeHtml(s) {
     return String(s ?? "").replace(/[&<>"']/g, (c) =>
@@ -362,6 +452,7 @@
     $$(".mic").forEach((m) => (m.style.display = "none"));
     $("#voiceQuick").disabled = true;
     $("#voiceQuickHint").textContent = "Voice input needs Chrome / Edge on this device.";
+    $("#globalMic").style.display = "none";
   }
 
   // ---------- init ----------
