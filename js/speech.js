@@ -128,5 +128,12 @@ const Speech = (() => {
     return total + current;
   }
 
-  return { isSupported, listen, stop, wordsToNumber, normalizeDigits };
+  // Is a single token a number (digits or a spelled-out number word)?
+  function isNumberWord(tok) {
+    if (tok == null) return false;
+    const t = normalizeDigits(String(tok).toLowerCase());
+    return /^\d+([.,]\d+)?$/.test(t) || t in UNITS || t in SCALES;
+  }
+
+  return { isSupported, listen, stop, wordsToNumber, normalizeDigits, isNumberWord };
 })();
