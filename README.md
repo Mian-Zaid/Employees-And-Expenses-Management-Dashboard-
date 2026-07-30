@@ -40,7 +40,7 @@ after adjusting the advances they already took.
 
 ### 🎙️ Global Smart Mic — "bol kar kuch bhi likhein"
 
-The floating mic button (bottom-right, on every tab) is the fastest way to work.
+The big mic button in the header (top-right, on every tab) is the fastest way to work.
 Just **speak a full sentence** and the app **figures out what you mean** and does
 the entry automatically — add a worker, or record a day's attendance + advance:
 
