@@ -1,5 +1,7 @@
 # 👷 Thekedar Dashboard — Labor & Wage Manager
 
+## Live App: https://mian-zaid.github.io/Employees-And-Expenses-Management-Dashboard-/
+
 A simple, offline-first app for a **thekedar (contractor)** to keep the daily
 record of **mistri / mazdoor / helpers**, their **daily wage (dihari)**, any
 **advance / kharcha** given during the week, and an automatic **weekly salary
